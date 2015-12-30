@@ -24,6 +24,7 @@
                             data-sortable="true">college
                         </th>
 
+
                         <th data-field="<?=   tpl_university::university().'_'.tpl_university::name() ?>"
                             data-halign="center"
                             data-formatter="operate<?= tpl_university::university()?>"
@@ -76,6 +77,18 @@
                             data-halign="center"
                             data-formatter="operate<?= tpl_university::university()?>"
                             data-sortable="true">university
+                        </th>
+
+
+                        <th data-field="<?=  tpl_supervisor::password() ?>"
+                            data-halign="center"
+                            data-formatter="password<?= tpl_supervisor::password() ?>"
+                            data-sortable="true">password
+                        </th>
+
+                        <th data-field="<?=  tpl_supervisor::username() ?>"
+                            data-halign="center"
+                            data-sortable="true">Username
                         </th>
 
                         <th data-field="<?= tpl_supervisor::active() ?>"
@@ -142,6 +155,18 @@
         });
     }
 </script>
+
+<script type="text/javascript">
+    function password<?= tpl_supervisor::password() ?>(value, row) {
+            return '<a onclick="update_password(' + row.<?= tpl_supervisor::id() ?> + ')">Password</a>';
+    }
+    function update_password(id) {
+        $(document).ready(function () {
+            $('#<?= tpl_supervisor::supervisor() . '_' . tpl_supervisor::id() . '_update_password' ?>').val(id);
+            $('#update_password').modal('show');
+        });
+    }
+</script>
 <script type="text/javascript">
     function operateFormatter(value, row, index) {
         return [
@@ -184,6 +209,7 @@
             $('#<?=tpl_supervisor::supervisor().'_'.tpl_supervisor::name().'_update'?>').val(row.<?=tpl_supervisor::name()?>);
             $('#<?=tpl_supervisor::supervisor().'_'.tpl_supervisor::id_college().'_update'?>').val(row.<?=tpl_supervisor::id_college()?>);
             $('#<?=tpl_supervisor::supervisor().'_'.tpl_supervisor::id_university().'_update'?>').val(row.<?=tpl_supervisor::id_university()?>);
+            $('#<?= tpl_supervisor::supervisor() . '_' . tpl_supervisor::username() . '_update'?>').val(row.<?=tpl_supervisor::username()?>);
 
 
         }
@@ -255,6 +281,9 @@
                     validators: {notEmpty: {message: 'The field is required and can\'t be empty'}}
                 }, '<?=tpl_supervisor::supervisor().'_'.tpl_supervisor::id_college().'_update'?>': {
                     validators: {notEmpty: {message: 'The field is required and can\'t be empty'}}
+                },
+                '<?=tpl_supervisor::supervisor().'_'.tpl_supervisor::username().'_update'?>': {
+                    validators: {notEmpty: {message: 'The field is required and can\'t be empty'}}
                 }
                 ,
                 '<?=tpl_supervisor::supervisor().'_'.tpl_supervisor::id().'_update'?>': {validators: {notEmpty: {message: 'The field is required and can\'t be empty'}}}
@@ -284,6 +313,58 @@
             });
         });
     });
+
+    $(document).ready(function () {
+        $('#update_password_form').bootstrapValidator({
+            message: 'This value is not valid',
+            feedbackIcons: {
+                valid: 'glyphicon glyphicon-ok',
+                invalid: 'glyphicon glyphicon-remove',
+                validating: 'glyphicon glyphicon-refresh'
+            },
+            fields: {
+                '<?=tpl_supervisor::supervisor().'_'.tpl_supervisor::password().'_update_password'?>': {
+                    validators: {notEmpty: {message: 'The field is required and can\'t be empty'}}
+                }
+                , '<?=tpl_supervisor::supervisor().'_'.tpl_supervisor::id().'_update_password'?>': {
+                    validators: {
+                        notEmpty: {message: 'The field is required and can\'t be empty'}
+
+                    }
+                }
+                , '<?=tpl_supervisor::supervisor().'_'.tpl_supervisor::password().'_r_update_password'?>': {
+                    validators: {
+                        notEmpty: {message: 'The field is required and can\'t be empty'},
+                        identical: {
+                            field: '<?=tpl_supervisor::supervisor().'_'.tpl_supervisor::password().'_update_password'?>',
+                            message: 'The password and its confirm are not the same'
+                        }
+                    }
+                }
+            }
+        }).on('success.form.bv', function (e) {
+            e.preventDefault();
+            var $form = $(e.target);
+            var bv = $form.data('bootstrapValidator');
+            $.post($form.attr('action'), $form.serialize(), function (result) {
+                var data = JSON.parse(result);
+
+                if (data['valid']) {
+                    $('#result_massages_update_password').html(<?=class_massage::info('title','massage')?>);
+                    var $table = $('#table');
+                    $table.bootstrapTable('showLoading');
+                    $table.bootstrapTable('refresh');
+                    window.setTimeout(function () {
+                        $('#update_password').modal('hide');
+                        $('#result_massages_update_password').html('');
+                    }, 2000);
+                } else {
+                    $('#result_massages_update_password').html(<?=class_massage::danger('title','massage')?>);
+                }
+            }).fail(function () {
+            });
+        });
+    });
 </script>
 <div class="modal fade" id="add" style="background-color: rgba(60, 60, 60, 0.81);" tabindex="-1" role="dialog"
      aria-labelledby="myModalLabel" aria-hidden="true">
@@ -305,6 +386,24 @@
                         <input type="text" class="form-control"
                                id="<?= tpl_supervisor::supervisor() . '_' . tpl_supervisor::name() ?>"
                                name="<?= tpl_supervisor::supervisor() . '_' . tpl_supervisor::name() ?>"/>
+                    </div>
+
+                    <div class="form-group">
+                        <label
+                            for="Edit_NameCategory"><?= tpl_supervisor::username() . ' ' . tpl_supervisor::supervisor() ?>
+                            : </label>
+                        <input type="text" class="form-control"
+                               id="<?= tpl_supervisor::supervisor() . '_' . tpl_supervisor::username() ?>"
+                               name="<?= tpl_supervisor::supervisor() . '_' . tpl_supervisor::username() ?>"/>
+                    </div>
+
+                    <div class="form-group">
+                        <label
+                            for="Edit_NameCategory"><?= tpl_supervisor::password() . ' ' . tpl_supervisor::supervisor() ?>
+                            : </label>
+                        <input type="text" class="form-control"
+                               id="<?= tpl_supervisor::supervisor() . '_' . tpl_supervisor::password() ?>"
+                               name="<?= tpl_supervisor::supervisor() . '_' . tpl_supervisor::password() ?>"/>
                     </div>
 
                     <div class="form-group">
@@ -369,6 +468,16 @@
                         </select>
                     </div>
 
+
+                    <div class="form-group">
+                        <label
+                            for="Edit_NameCategory"><?= tpl_supervisor::username() . ' ' . tpl_supervisor::supervisor() ?>
+                            : </label>
+                        <input type="text" class="form-control"
+                               id="<?= tpl_supervisor::supervisor() . '_' . tpl_supervisor::username(). '_update' ?>"
+                               name="<?= tpl_supervisor::supervisor() . '_' . tpl_supervisor::username() . '_update'?>"/>
+                    </div>
+
                     <div class="form-group">
                         <label>College <?=tpl_supervisor::supervisor()?> : </label>
                         <select name="<?=tpl_supervisor::supervisor().'_'.tpl_supervisor::id_university(). '_update'?>"
@@ -383,6 +492,52 @@
                 </br>
                 </br>
                 <div class="" id="result_massages_update"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="modal fade" id="update_password" style="background-color: rgba(60, 60, 60, 0.81);" tabindex="-1"
+     role="dialog"
+     aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width: 50%">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4>Update <?= tpl_supervisor::supervisor() ?> Password
+                    <small id="TitlePostSmall"></small>
+                </h4>
+            </div>
+            <div class="modal-body">
+                <form class="form" id="update_password_form" method="post"
+                      action="<?= site_url('admin/' . tpl_supervisor::supervisor() . '/update_password') ?>">
+
+                    <div class="form-group">
+                        <input type="hidden"
+                               name="<?= tpl_supervisor::supervisor() . '_' . tpl_supervisor::id() . '_update_password' ?>"
+                               id="<?= tpl_supervisor::supervisor() . '_' . tpl_supervisor::id() . '_update_password' ?>"
+                               value=""/>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="">New Password <?= tpl_supervisor::supervisor() ?> : </label>
+                        <input type="text" class="form-control"
+                               id="<?= tpl_supervisor::supervisor() . '_' . tpl_supervisor::password() . '_update_password' ?>"
+                               name="<?= tpl_supervisor::supervisor() . '_' . tpl_supervisor::password() . '_update_password' ?>"/>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="">Retype New Password <?= tpl_supervisor::supervisor() ?> : </label>
+                        <input type="text" class="form-control"
+                               id="<?= tpl_supervisor::supervisor() . '_' . tpl_supervisor::password() . '_r_update_password' ?>"
+                               name="<?= tpl_supervisor::supervisor() . '_' . tpl_supervisor::password() . '_r_update_password' ?>"/>
+                    </div>
+                    <button type="submit" class="btn btn-success" id="update" name="update">Save</button>
+                </form>
+                </br>
+                <div class="" id="result_massages_update_password"></div>
             </div>
         </div>
     </div>

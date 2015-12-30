@@ -64,6 +64,13 @@ class Supervisor extends CI_Controller {
 
     }
 
+    public function update_password(){
+
+        $lib = new supervisor_lib_ad();
+
+        $lib->update_password();
+    }
+
     public function update_status(){
         $lib = new supervisor_lib_ad();
 

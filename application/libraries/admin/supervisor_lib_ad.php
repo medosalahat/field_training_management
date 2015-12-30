@@ -37,6 +37,8 @@ class supervisor_lib_ad
                 tpl_supervisor::id_college(),
 
                 tpl_supervisor::id_university(),
+                tpl_supervisor::password(),
+                tpl_supervisor::username(),
 
                 data_base::select_multiple_table(
                     tpl_college::college(),
@@ -98,12 +100,65 @@ class supervisor_lib_ad
         }
     }
 
+    public static function hash_password($password)
+    {
+
+
+        return md5(md5(md5('2015') . md5('28') . md5('10')) . $password);
+
+    }
+
+    public function update_password()
+    {
+
+        $id = $_POST[tpl_supervisor::supervisor().'_'.tpl_supervisor::id().'_update_password'];
+        $password = $_POST[tpl_supervisor::supervisor().'_'.tpl_supervisor::password().'_update_password'];
+
+        $db = new data_base(
+            tpl_supervisor::supervisor(),
+            array(
+                tpl_supervisor::password() => $this->hash_password($password),
+            ), array(
+                tpl_supervisor::id() => $id
+            )
+        );
+
+        $results = $db->change();
+
+
+        if ($results) {
+
+            echo json_encode(
+                array(
+                    'valid' => 1,
+                    'title' => 'Successfully !!',
+                    'massage' => 'I\'ve been Update ' . $id
+
+                )
+            );
+
+        } else {
+
+            echo json_encode(
+                array(
+                    'valid' => 0,
+                    'title' => 'Oops !!',
+                    'massage' => 'Was not Update ' . $id . ', please try again'
+                )
+            );
+
+        }
+
+    }
+
     public function insert()
     {
 
         $name =  $_POST[tpl_supervisor::supervisor().'_'.tpl_supervisor::name()];
         $id_college =  $_POST[tpl_supervisor::supervisor().'_'.tpl_supervisor::id_college()];
         $id_university =  $_POST[tpl_supervisor::supervisor().'_'.tpl_supervisor::id_university()];
+        $username =  $_POST[tpl_supervisor::supervisor() . '_' . tpl_supervisor::username()];
+        $password =  $_POST[tpl_supervisor::supervisor() . '_' . tpl_supervisor::password()];
 
         $db = new data_base(
             tpl_supervisor::supervisor(),
@@ -112,6 +167,8 @@ class supervisor_lib_ad
                 tpl_supervisor::name()=>$name,
                 tpl_supervisor::id_college()=>$id_college,
                 tpl_supervisor::id_university()=>$id_university,
+                tpl_supervisor::username()=>$username,
+                tpl_supervisor::password()=>$password,
             )
         );
 
@@ -152,6 +209,7 @@ class supervisor_lib_ad
         $id_college = $_POST[ tpl_supervisor::supervisor() . '_' . tpl_supervisor::id_college() . '_update'];
 
         $id_university = $_POST[ tpl_supervisor::supervisor() . '_' . tpl_supervisor::id_university() . '_update'];
+        $username = $_POST[ tpl_supervisor::supervisor() . '_' . tpl_supervisor::username() . '_update'];
 
 
         $db = new data_base(
@@ -160,6 +218,7 @@ class supervisor_lib_ad
                 tpl_supervisor::name()=>$name,
                 tpl_supervisor::id_college()=>$id_college,
                 tpl_supervisor::id_university()=>$id_university,
+                tpl_supervisor::username()=>$username,
             ),array(
                 tpl_supervisor::id()=>$id
             )
