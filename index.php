@@ -1,22 +1,25 @@
 <?php
 define('ENVIRONMENT', 'development');
+
 if (defined('ENVIRONMENT'))
 {
     switch (ENVIRONMENT)
     {
         case 'development':
-            error_reporting(E_ALL);
+            error_reporting(1);
             break;
 
         case 'testing':
         case 'production':
-            error_reporting(0);
+            error_reporting(1);
             break;
 
         default:
             exit('The application environment is not set correctly.');
     }
 }
+ini_set('display_errors', true);
+error_reporting(E_ALL);
 $system_path = 'system';
 $application_folder = 'application';
 if (defined('STDIN'))
